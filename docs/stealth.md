@@ -11,7 +11,8 @@ When enabled, Stealth applies additional techniques to make browser activity app
 
 ### Maxun Cloud
 
-- Stealth is enabled by deafult on all Cloud plans.
+- Stealth can be enabled by checking the `Stealth` checkbox when creating a robot.
+- For each run stealth can be enabled or disabled via the robot settings.
 - No additional setup is required.
 
 ### Maxun OSS
