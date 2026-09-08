@@ -41,92 +41,47 @@ Looking for a proxy provider? The following partners offer reliable proxies that
 
 <table>
 <tr>
-<td width="30%" height="100">
+<td width="30%" align="center" valign="middle">
 <a href="https://www.webshare.io/?referral_code=wwhk524ynls2">
-  <img src="https://github.com/user-attachments/assets/c3a60969-a8f8-4d2c-acef-22bee80c2484" alt="Webshare" width="400" height="180" />
+<img src="https://github.com/user-attachments/assets/c3a60969-a8f8-4d2c-acef-22bee80c2484" alt="Webshare" width="300" />
 </a>
 </td>
-<td width="70%">
-
-#### <a href="https://www.webshare.io/?referral_code=wwhk524ynls2">Webshare</a>
-
-Webshare gives you instant access to a proxy pool of 80M+ ethically-sourced IPs across 195+ countries, with rotating residential, static ISP, and datacenter options plus a full API. It includes a 100+ Gbps backbone, country/city/state/ZIP/ASN-level targeting, and requires no credit card to start.
-**Free tier: 10 proxies with 1GB/month - enough to test-drive the service before you commit.**
-<br />
-<b>Discount Code: `MAXUN20` - Get 20% off your first purchase.</b>
+<td width="70%" valign="middle">
+<a href="https://www.webshare.io/?referral_code=wwhk524ynls2"><strong>Webshare</strong></a><br/>
+Webshare gives you instant access to a proxy pool of 80M+ ethically-sourced IPs across 195+ countries, with rotating residential, static ISP, and datacenter options plus a full API. It includes a 100+ Gbps backbone, country/city/state/ZIP/ASN-level targeting, and requires no credit card to start.<br/>
+<strong>Free tier:</strong> 10 proxies with 1GB/month - enough to test-drive the service before you commit.<br/>
+<strong>Discount Code:</strong> <code>MAXUN20</code> - Get 20% off your first purchase.
 </td>
 </tr>
 
 <tr>
-<td width="35%" height="100">
-<a href="https://www.ipcook.com/?ref=githubmaxun&utm_source=github&utm_medium=referral&utm_campaign=maxun">
-  <img src="https://github.com/user-attachments/assets/b0fba023-a858-4e99-aa28-07754dce67b5" alt="IPcook" width="400" height="120" />
+<td width="30%" align="center" valign="middle">
+<a href="https://mangoproxy.com/?utm_source=github&utm_medium=partner&utm_campaign=getmaxun">
+<img src="https://github.com/user-attachments/assets/326b5b8f-6a2c-4aa2-94c8-6a29ae23f2ac" alt="MangoProxy" width="300" />
 </a>
 </td>
-<td width="70%">
-
-#### <a href="https://www.ipcook.com/?ref=githubmaxun&utm_source=github&utm_medium=referral&utm_campaign=maxun">IPcook</a>
-
-IPcook provides 55M+ real residential IPs across 185+ countries and regions, delivering fast and reliable proxy solutions for web scraping, automation, and data collection. 99.99% uptime, average response times under 0.5s, and 100,000 concurrency at max. Start with a [FREE 100MB Trial](https://www.ipcook.com/?ref=githubmaxun&utm_source=github&utm_medium=referral&utm_campaign=maxun) to experience IPcook’s proxy service.
-
-<b>Discount Code: `WELCOME20` - Get 20% off your first purchase.</b>
+<td width="70%" valign="middle">
+<a href="https://mangoproxy.com/?utm_source=github&utm_medium=partner&utm_campaign=getmaxun"><strong>MangoProxy</strong></a><br/>
+MangoProxy offers Residential, ISP, Datacenter, and Mobile Proxies in 200+ countries with HTTP(S)/SOCKS5 support and flexible IP management.<br/>
+<strong>Discount Code:</strong> <code>MAXUN</code> 8% off Static ISP Proxies.
 </td>
 </tr>
+
 <tr>
-<td width="40%" height="100">
+<td width="30%" align="center" valign="middle">
 <a href="https://go.nodemaven.com/maxunbyopaugust">
-  <img src="https://github.com/user-attachments/assets/348c011f-8c73-4845-85b9-8dd85f6e85ec" alt="Nodemaven" width="600" height="120" />
+<img src="https://github.com/user-attachments/assets/348c011f-8c73-4845-85b9-8dd85f6e85ec" alt="Nodemaven" width="300" />
 </a>
 </td>
-<td width="70%">
+<td width="70%" valign="middle">
+<a href="https://go.nodemaven.com/maxunbyopaugust"><strong>Nodemaven</strong></a><br/>
+The most efficient proxy provider for Web Scraping and Automation with the Highest Quality IP on the market.<br/>
+Why <a href="https://go.nodemaven.com/maxunbyopaugust">Nodemaven</a>?
 
-#### <a href="https://go.nodemaven.com/maxunbyopaugust">Nodemaven</a>
 
-The most efficient proxy provider for Web Scraping and Automation with the Highest Quality IP on the market. Why <a href="https://go.nodemaven.com/maxunbyopaugust">Nodemaven</a>?
-
-- ZIP targeting
-- 99.9% uptime
-- IP filtering: all proxies have fraud score &lt;97%
-- No KYC required
-- Unique free tools: Proxy Bandwidth Checker, Meta Tag Checker, IP Lookup and others!
-
-<b>Discount Code: <code>MAXUN35</code> - 35% off Mobile and Residential Proxies. <code>MAXUN40</code> - 40% off ISP (Static) Proxies.</b>
-
-</td>
-</tr>
-
-<tr>
-<td width="40%" height="100">
-<a href="https://www.novada.com/?github-maxun">
-  <img src="https://github.com/user-attachments/assets/68262e31-639a-4d36-a281-e50b68fcdc92" alt="Novada" width="500" height="150" />
-</a>
-</td>
-<td width="70%">
-
-#### <a href="https://www.novada.com/?github-maxun">Novada</a>
-
-Novada provides high-quality residential proxies and a powerful Scraper API for reliable web data collection at scale. Access real residential IPs worldwide, reduce blocks, and collect the data your scraping workflows need.
-
-<b>Discount Code: `GitNOVADA` - Get 20% off Rotating Residential Proxies and Scraping solutions.</b>
-</td>
-</tr>
-</table>
-
-### Partners
-
-<table>
-<tr>
-<td width="40%" height="100">
-<a href="https://www.coreclaw.com/?utm_source=github&utm_medium=cpc&utm_campaign=max&utm_term=&utm_id=max">
-  <img src="https://github.com/user-attachments/assets/f3421d5c-d789-4f8c-8bfd-b41a81afdc68" alt="CoreClaw" width="400" height="150" />
-</a>
-</td>
-<td width="70%">
-
-#### <a href="https://www.coreclaw.com/?utm_source=github&utm_medium=cpc&utm_campaign=max&utm_term=&utm_id=max">CoreClaw</a>
-
-CoreClaw — Production-ready Web Data APIs for AI agents and developers. Extract structured data from the web and build powerful automation workflows.
-
+· ZIP targeting · 99.9% uptime · IP filtering: all proxies have fraud score &lt;97% 
+· No KYC required · Free tools including Proxy Bandwidth Checker, Meta Tag Checker, and IP Lookup.<br/>
+<strong>Discount Codes:</strong> <code>MAXUN35</code> - 35% off Mobile and Residential Proxies. <code>MAXUN40</code> - 40% off ISP (Static) Proxies.
 </td>
 </tr>
 </table>
