@@ -38,7 +38,7 @@ It supports extraction, crawling, scraping, monitoring and search - designed to 
   </tr>
 </table>
 
-## How To Use Maxun.
+## How To Use Maxun
 
 Maxun is no-code by default, with APIs, CLI, MCP, and SDKs for deeper integrations without changing how extractions are defined.
 
