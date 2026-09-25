@@ -6,11 +6,11 @@ sidebar_position: 5
 
 # Document
 
-Work with PDF documents — extract specific fields or convert to Markdown, HTML, and links.
+Extract structured data, generate summaries, or convert documents into clean Markdown, HTML, and links.
 
 ## Extract
 
-Upload a PDF and describe what you want. Maxun creates a reusable robot that extracts those fields from any similar document.
+Upload a document (PDF, CSV, XLSX, JPG, PNG or DOCX) and describe what you want. Maxun creates a reusable robot that extracts those fields from any similar document.
 
 ```javascript
 import { Client } from 'maxun-sdk';
@@ -35,7 +35,7 @@ console.log(result.data.documentData);
 
 ## Parse
 
-Convert a PDF into Markdown, HTML, or a list of links.
+Convert a document (PDF, CSV, XLSX, JPG, PNG or DOCX) into Markdown, HTML, or a list of links.
 
 ```javascript
 const { robot, parsedOutput } = await client.createDocumentParseRobot(

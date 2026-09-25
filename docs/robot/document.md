@@ -5,22 +5,24 @@ title: Document
 
 # Document
 
-Maxun can work with documents in two ways — pull out specific data fields, or convert the whole document into a clean format.
+Maxun can work with documents in two ways:
+1. **Structured Extraction**: Extract specific data fields from documents.
+2. **Document Conversion**: Convert entire documents into a clean, structured format.
 
-> Note: Document robots is in beta.
+Note: Document Robots is in beta.
 
 ### Supported Files
 
-Document robots accept **PDF**, **CSV**, **XLSX**, and **DOCX** files, up to **10 MB**. For multi-sheet XLSX files, each sheet is treated as a separate page.
+Document robots accept **PDF**, **CSV**, **XLSX**, **JPG**, **PNG**, and **DOCX** files, up to **10 MB**. For multi-sheet XLSX files, each sheet is treated as a separate page.
 
 ## Extract
 
-Upload a PDF, CSV, XLSX, or DOCX file and tell Maxun what information you want from it. Maxun figures out the structure automatically and saves it as a reusable robot — so you can run it on new documents any time.
+Upload a PDF, CSV, XLSX, JPG, PNG or DOCX file and tell Maxun what information you want from it. Maxun figures out the structure automatically and saves it as a reusable robot — so you can run it on new documents any time.
 
 
 ### How It Works
 
-1. Upload a sample document (PDF, CSV, XLSX, or DOCX).
+1. Upload a sample document (PDF, CSV, XLSX, JPG, PNG, or DOCX).
 2. Describe what you want to extract (e.g. *"invoice number, vendor name, and total amount"*).
 3. Maxun creates a robot that can extract those fields from any similar document.
 4. Run the robot whenever you have a new file to process.
@@ -34,23 +36,23 @@ Upload a PDF, CSV, XLSX, or DOCX file and tell Maxun what information you want f
 
 ## Parse
 
-Upload a PDF, CSV, XLSX, or DOCX file and convert it into clean Markdown, HTML, a list of links, or an AI-generated summary. No configuration needed — just pick your format and run.
+Upload a PDF, CSV, XLSX, JPG, PNG, or DOCX file and convert it into clean Markdown, HTML, a list of links, or an AI-generated summary. No configuration needed — just pick your format and run.
 
 
 ### How It Works
 
-1. Upload a document (PDF, CSV, XLSX, or DOCX).
-2. Choose your output format — Markdown, HTML, Links, or Summary.
+1. Upload a document (PDF, CSV, XLSX, JPG, PNG, or DOCX ).
+2. Choose your output format - Markdown, HTML, Links, or Summary.
 3. Maxun converts the document and makes it available for every run.
 
 ### Output Formats
 
-- **Markdown** — The full document as clean, readable Markdown. Great for feeding into AI tools.
-- **HTML** — The document as structured HTML.
-- **Links** — Every URL found in the document, deduplicated.
-- **Summary** — A concise, AI-generated summary of the document. Requires an LLM provider (Ollama, Anthropic, or an OpenAI-compatible provider), configured when you create the robot.
+- **Markdown** - The full document as clean, readable Markdown. Great for feeding into AI tools.
+- **HTML** - The document as structured HTML.
+- **Links** - Every URL found in the document, deduplicated.
+- **Summary** - A concise, AI-generated summary of the document. Requires an LLM provider (Ollama, Anthropic, or an OpenAI-compatible provider), configured when you create the robot.
 
-> Note: The Summary format uses your configured LLM. For Ollama it runs locally with no key; for hosted providers you must supply an API key when creating the robot, or set `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` in your server environment.
+> Note: Self-hosted installations use your configured LLM. Ollama runs locally without an API key; hosted providers require an API key when creating the robot or via `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` in your server environment. Maxun Cloud automatically selects the best AI for the task.
 
 ### ✅ When to Use Parse
 

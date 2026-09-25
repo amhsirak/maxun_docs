@@ -22,19 +22,18 @@ Just provide a URL, choose your output format, and Maxun handles the rest.
 3. Optionally add a **Smart Query** prompt (see below).
 4. Run the robot.  
 
-**Batch scraping** is coming soon, allowing you to process multiple URLs in a single run.
 
 ## When to Use Scrape
 - Fast content extraction  
 - Clean HTML or Markdown for an LLM  
 
-If you need logins, interactions, pagination, or element-level data capture, use **Extract** instead.
+If you need logins, interactions, pagination, or element-level data capture, use <a href="/category/extract">Extract</a> instead.
 
 ---
 
 ## Smart Queries
 
-Smart Queries let you attach an optional **natural language prompt** to a scrape robot. After the page is scraped, an LLM analyzes the page content and returns an answer to your prompt — without any extra setup.
+Smart Queries let you attach an optional **natural language prompt** to a scrape robot. After the page is scraped, an LLM analyzes the page content and returns an answer to your prompt - without any extra setup.
 
 ### How to Add a Smart Query
 
