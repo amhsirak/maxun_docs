@@ -112,7 +112,7 @@ maxun robots search "Latest AI news" --mode discover --limit 10 -n "AI News"
 Create a robot that extracts structured fields from a document using AI.
 
 ```bash
-maxun robots doc-extract <pdf> [options]
+maxun robots doc-extract <document> [options]
 ```
 
 | Option | Description |
@@ -133,7 +133,7 @@ maxun robots doc-extract invoice.pdf \
 Create a robot that converts a document into Markdown, HTML, and/or extracted links — no LLM, free.
 
 ```bash
-maxun robots doc-parse <pdf> [options]
+maxun robots doc-parse <document> [options]
 ```
 
 | Option | Description |
@@ -143,9 +143,9 @@ maxun robots doc-parse <pdf> [options]
 
 **Example:**
 ```bash
-maxun robots doc-parse report.pdf \
-  --formats "markdown,html,links" \
-  --name "Report Parser"
+maxun robots doc-parse banner.png \
+  --formats "markdown" \
+  --name "PNG Banner Parser"
 ```
 
 Runs complete in 1–3 seconds.
