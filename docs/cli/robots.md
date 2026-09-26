@@ -6,21 +6,53 @@ sidebar_position: 2
 
 # Robots
 
-The `maxun robots` command group lets you create, list, inspect, and manage robots from the terminal.
+The `maxun robots` command group lets you create, inspect, and manage robots from the terminal.
 
-## List Robots
+## On this page
+
+* [Manage Robots](#manage-robots)
+  * [List Robots](#list-robots)
+  * [Get, Duplicate, and Delete Robots](#get-duplicate-and-delete-robots)
+* [Create Robots](#create-robots)
+  * [AI extraction](#ai-extraction)
+  * [Scrape](#scrape)
+  * [Crawl](#crawl)
+  * [Search](#search)
+  * [Document extract](#document-extract-doc-extract)
+  * [Document parse](#document-parse-doc-parse)
+
+## Manage Robots
+
+### List Robots
+
+`maxun robots list` returns all robots as JSON by default. Use `--table` for a formatted view:
 
 ```bash
 maxun robots list
-```
-
-Returns all robots as JSON by default. Use `--table` for a formatted view:
-
-```bash
 maxun robots list --table
 ```
 
+### Get, Duplicate, and Delete Robots
+
+| Command                                       | Description                                   |
+| --------------------------------------------- | --------------------------------------------- |
+| `maxun robots get <id>`                       | Get details for a specific robot              |
+| `maxun robots duplicate <id> --url <new-url>` | Duplicate a robot with a different target URL |
+| `maxun robots delete <id>`                    | Delete a robot                                |
+
 ## Create Robots
+
+Choose a command based on what you want to do:
+
+| Command       | Use case                                                        |
+| ------------- | --------------------------------------------------------------- |
+| `extract`     | Extract structured data from a webpage using AI                 |
+| `scrape`      | Scrape a single webpage                                         |
+| `crawl`       | Crawl multiple pages on a website                               |
+| `search`      | Find webpages using a search query                              |
+| `doc-extract` | Extract structured fields from a document using AI              |
+| `doc-parse`   | Convert a document into Markdown, HTML, or links without an LLM |
+
 
 ### AI Extraction
 
@@ -143,17 +175,5 @@ maxun robots doc-parse <document> [options]
 
 **Example:**
 ```bash
-maxun robots doc-parse banner.png \
-  --formats "markdown" \
-  --name "PNG Banner Parser"
+maxun robots doc-parse banner.png --formats "markdown" --name "PNG Banner Parser"
 ```
-
-Runs complete in 1–3 seconds.
-
-## Other Robot Commands
-
-| Command | Description |
-|---------|-------------|
-| `maxun robots get <id>` | Get details for a specific robot |
-| `maxun robots delete <id>` | Delete a robot |
-| `maxun robots duplicate <id> --url <new-url>` | Duplicate a robot with a different target URL |
