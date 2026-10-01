@@ -6,323 +6,124 @@ sidebar_position: 5
 
 # Search
 
-Perform web searches and optionally scrape content from search results using DuckDuckGo.
-
-## Creating Search Robots
+A search robot searches the web (with DuckDuckGo) and returns the results. It can also open each result and scrape its content, so you get search plus page content in one step.
 
 ```python
-from maxun import Search, SearchConfig, Config
+robot = await maxun.search("AI news", "AI model releases", time_range="week")
 
-searcher = Search(
-    Config(api_key="your-api-key")
-)
+result = await robot.run()
 
-robot = await searcher.create(
-    "Tech News Search",
-    SearchConfig(
-        query="artificial intelligence 2025",
-        mode="discover",
-        limit=10,
-    ),
-)
+for item in result.search_data["Search Results"]["results"]:
+    print(item["title"], item["url"])
 ```
 
-## Configuration
+## Options
 
-### Required Options
+| Option | Default | Description |
+|---|---|---|
+| `mode` | `"discover"` | `"discover"` returns titles, URLs and snippets. `"scrape"` also opens every result and scrapes it |
+| `limit` | `10` | Number of results |
+| `time_range` | any time | Only results from the last `"day"`, `"week"`, `"month"` or `"year"` |
+| `formats` | `["markdown"]` | In scrape mode, what to capture from each result: `markdown`, `html`, `text`, `links`, `summary`, `screenshot-visible`, `screenshot-fullpage` |
 
-**query** (required)
+## Search modes
 
-The search query in natural language.
+### Discover
+
+The default. Fast: returns the search results themselves, without visiting the pages.
 
 ```python
-SearchConfig(
-    query="latest AI developments",
-)
+robot = await maxun.search("Scraping tools", "open source web scraping tools", limit=20)
+
+result = await robot.run()
+
+for item in result.search_data["Search Results"]["results"]:
+    print(item["position"], item["title"])
+    print(item["url"])
+    print(item["description"])
 ```
 
-### Optional Configuration
+### Scrape
 
-**mode** (optional)
-
-Search mode. Defaults to `discover`.
-
-- `discover` - Returns only search result metadata (title, URL, description)
-- `scrape` - Visits each result page and extracts full content
+Pass `mode="scrape"` to open every result and get its content in the formats you choose.
 
 ```python
-SearchConfig(
-    query="web scraping tools",
-    mode="discover",  # or "scrape"
-)
-```
-
-**limit** (optional)
-
-Maximum number of search results to return. Defaults to 10.
-
-```python
-SearchConfig(
-    query="AI news",
-    limit=20,
-)
-```
-
-**filters** (optional)
-
-Search filters for time range and region.
-
-```python
-SearchConfig(
-    query="AI startups",
-    filters={
-        "timeRange": "week",   # "day", "week", "month", "year"
-        "region": "us-en",
-    },
-)
-```
-
-**provider** (optional)
-
-Search provider. Currently only `duckduckgo` is supported. Defaults to `duckduckgo`.
-
-```python
-SearchConfig(
-    query="AI research",
-    provider="duckduckgo",
-)
-```
-
-## Search Modes
-
-### Discover Mode
-
-Returns search result metadata only. Fast and lightweight.
-
-```python
-robot = await searcher.create(
-    "Quick Research",
-    SearchConfig(
-        query="web scraping tools",
-        mode="discover",
-        limit=10,
-    ),
+robot = await maxun.search(
+    "Scraping guides",
+    "how to scrape a website with python",
+    mode="scrape",
+    limit=5,
+    formats=["markdown", "links"],
 )
 
 result = await robot.run()
+
+for page in result.search_data["Search Results"]["results"]:
+    print(page["metadata"]["url"])
+    print(page.get("markdown", "")[:300])
 ```
 
-**Returns:**
-- Title
-- URL
-- Description
+Each scraped result has the formats you asked for plus `metadata` (`url`, `title`, ...) and `searchResult` (the original `position` and title in the search results). A result that could not be opened has an `error` instead.
 
-### Scrape Mode
-
-Visits each search result and extracts full page content.
+## Time range
 
 ```python
-robot = await searcher.create(
-    "Deep Research",
-    SearchConfig(
-        query="machine learning tutorials",
-        mode="scrape",
-        limit=10,
-    ),
-)
-
-result = await robot.run()
+robot = await maxun.search("Today's AI news", "artificial intelligence", time_range="day")
 ```
 
-**Returns all above plus:**
-- Full page metadata
-- HTML content
-- Clean text content
-- Links found on page
-- HTTP status code
-
-## Time Filters
-
-Filter results by publication date.
-
-```python
-# Last 24 hours
-SearchConfig(
-    query="AI news",
-    filters={"timeRange": "day"},
-)
-
-# Last 7 days
-SearchConfig(
-    query="AI news",
-    filters={"timeRange": "week"},
-)
-
-# Last 30 days
-SearchConfig(
-    query="AI news",
-    filters={"timeRange": "month"},
-)
-
-# Last 12 months
-SearchConfig(
-    query="AI news",
-    filters={"timeRange": "year"},
-)
-```
+Use `"day"`, `"week"`, `"month"` or `"year"`. Leave it out to search any time.
 
 ## Examples
 
-### Quick Research
+### Research a topic
 
 ```python
-robot = await searcher.create(
-    "Topic Research",
-    SearchConfig(
-        query="react best practices 2025",
-        mode="discover",
-        limit=15,
-        filters={"timeRange": "year"},
-    ),
+robot = await maxun.search(
+    "LLM agents research",
+    "LLM agent benchmarks",
+    mode="scrape",
+    limit=5,
+    formats=["summary"],
 )
 
 result = await robot.run()
-
-for item in result["data"]["searchData"]:
-    print("Title:", item.get("title"))
-    print("URL:", item.get("url"))
-    print("Description:", item.get("description"))
+for page in result.search_data["Search Results"]["results"]:
+    print(page["metadata"]["url"], "→", page.get("summary"))
 ```
 
-### Content Scraping
+`summary` uses an LLM. On self-hosted Maxun, also pass `llm_provider`, `llm_api_key` and optionally `llm_model` and `llm_base_url`. On Maxun Cloud, leave them out.
+
+### Daily news digest
 
 ```python
-robot = await searcher.create(
-    "Content Analysis",
-    SearchConfig(
-        query="climate change solutions",
-        mode="scrape",
-        limit=10,
-        filters={"timeRange": "month"},
-    ),
-)
-
-result = await robot.run()
-
-for item in result["data"]["searchData"]:
-    print("URL:", item.get("metadata", {}).get("url"))
-    print("Title:", item.get("metadata", {}).get("title"))
-    print("Content:", item.get("text"))
-    print("Word count:", item.get("wordCount"))
+robot = await maxun.search("Competitor news", "Acme Corp announcement", time_range="day")
+await robot.schedule(run_every=1, run_every_unit="DAYS", at_time_start="08:00", timezone="Asia/Kolkata")
+await robot.add_webhook("https://your-app.com/hooks/news")
 ```
 
-### Breaking News
+Every morning Maxun runs the search and sends the results to your webhook.
+
+### Several queries
 
 ```python
-robot = await searcher.create(
-    "News Monitor",
-    SearchConfig(
-        query="technology breakthroughs",
-        mode="scrape",
-        limit=20,
-        filters={"timeRange": "day"},
-    ),
-)
-```
-
-### Competitive Research
-
-```python
-robot = await searcher.create(
-    "Competitor Analysis",
-    SearchConfig(
-        query="best project management tools",
-        mode="scrape",
-        limit=30,
-        filters={"timeRange": "year"},
-    ),
-)
-```
-
-### Market Analysis
-
-```python
-queries = [
-    "AI automation tools",
-    "workflow automation software",
-    "business process automation",
-]
+queries = ["AI automation tools", "workflow automation software", "RPA platforms"]
 
 for query in queries:
-    robot = await searcher.create(
-        f"Market Research: {query}",
-        SearchConfig(
-            query=query,
-            mode="discover",
-            limit=20,
-            filters={"timeRange": "month"},
-        ),
-    )
-
+    robot = await maxun.search(f"Market: {query}", query, time_range="month")
     result = await robot.run()
-    await save_to_database(query, result["data"]["searchData"])
+    save_to_database(query, result.search_data["Search Results"]["results"])
 ```
 
-## Accessing Search Results
-
-### Discover Mode Results
+## Managing search robots
 
 ```python
-result = await robot.run()
-
-if result["data"].get("searchData"):
-    results = result["data"]["searchData"]
-
-    for item in results:
-        print("Title:", item.get("title"))
-        print("URL:", item.get("url"))
-        print("Description:", item.get("description"))
+robots = await maxun.search.list()
+await robot.set_list_limit(25)     # change the number of results
+await robot.delete()
 ```
 
-### Scrape Mode Results
+:::note
+Search robots are not deduplicated by name: every `maxun.search(...)` call creates a new robot. Reuse a robot with `await maxun.robots.find(name)` instead of creating it again.
+:::
 
-```python
-result = await robot.run()
-
-if result["data"].get("searchData"):
-    results = result["data"]["searchData"]
-
-    for item in results:
-        print("URL:", item.get("metadata", {}).get("url"))
-        print("Title:", item.get("metadata", {}).get("title"))
-        print("HTML:", item.get("html"))
-        print("Text:", item.get("text"))
-        print("Links:", item.get("links"))
-        print("Status:", item.get("metadata", {}).get("statusCode"))
-        print("Summary:", item.get("summary"))
-```
-
-## Managing Search Robots
-
-```python
-# Get all search robots
-robots = await searcher.get_robots()
-
-# Get specific robot
-robot = await searcher.get_robot("robot-id")
-
-# Delete robot
-await searcher.delete_robot("robot-id")
-```
-
-## Running Search Robots
-
-```python
-# Run immediately
-result = await robot.run()
-
-# Run with timeout (milliseconds)
-result = await robot.run(timeout=30000)
-```
-
-For scheduling, webhooks, and other robot management features, see <a href="/sdk/python-sdk/sdk-robot">Robot Management</a>.
+See [Robot Management](./sdk-robot) to run, schedule and manage robots.

@@ -1,320 +1,238 @@
 ---
 id: sdk-extract
 title: Extract
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Extract
 
-Build structured data extraction workflows programmatically using the SDK.
+An extract robot pulls structured data (product lists, prices, job postings, tables) out of web pages. There are two ways to build one using Maxun SDK:
 
-## Creating Extract Robots
-Extract robots can be created using LLM-based extraction or non-LLM rules.
+- **With a prompt**: describe the data in plain English and Maxun builds the robot for you.
+- **With selectors**: list the steps and CSS or XPath selectors yourself, for precise and predictable results.
 
-### LLM Extraction (Beta)
+Both return a [`Robot`](./sdk-robot) that you can run as often as you like.
 
-Create robots using natural language.
+## Extract with a prompt
 
 ```python
-from maxun import Extract, Config
-
-extractor = Extract(Config(api_key="your-api-key"))
-
-robot = await extractor.extract(
-    url="https://example.com",
-    prompt="Extract first 20 product names and prices",
+robot = await maxun.extract(
+    "YC companies",
+    "https://www.ycombinator.com/companies",
+    prompt="Company name, description and batch for the first 15 companies",
 )
 
 result = await robot.run()
+
+for company in result.list_data:
+    print(company)
 ```
 
-On Maxun Cloud, that is all you need. The provider, model and credentials are managed for you.
+```python
+{'Company name': 'Airbnb', 'Description': 'Book accommodations around the world.', 'Batch': 'W09'}
+{'Company name': 'Stripe', 'Description': 'Economic infrastructure for the internet.', 'Batch': 'S09'}
+...
+```
 
-#### Bringing your own model (self-hosted only)
+### Without a URL
 
-Self-hosted instances can point extraction at your own LLM using `llm_provider`, `llm_model`, `llm_api_key` and `llm_base_url`.
+Leave the URL out and Maxun searches the web for a suitable page first:
 
 ```python
-# Self-hosted instances only
-robot = await extractor.extract(
-    url="https://example.com",
-    prompt="Extract first 20 product names and prices",
-    llm_provider="anthropic",
-    llm_model="claude-3-5-sonnet-20241022",
-    llm_api_key="your-anthropic-api-key",
+robot = await maxun.extract(
+    "Top AI startups",
+    prompt="Names and funding of the top 10 AI startups from YCombinator",
 )
 ```
 
-See <a href="/robot/extract/llm-extraction">AI Mode</a> for provider details and <a href="/llm-prompts">LLM Extraction Prompts</a> for writing effective prompts.
+### LLM settings (self-hosted)
 
-### Non LLM Extraction
-
-For non-LLM extraction, you define exact CSS selectors to capture data from web pages.
+On Maxun Cloud, a prompt is all you need. Self-hosted Maxun has no built-in LLM, so pass one:
 
 ```python
-from maxun import Extract, Config
+robot = await maxun.extract(
+    "Products",
+    "https://shop.example.com",
+    prompt="Product names and prices",
+    llm_provider="anthropic",        # "anthropic", "openai" or "ollama"
+    llm_api_key="your-llm-api-key",  # required for anthropic and openai
+    llm_model="claude-sonnet-4-5",   # optional
+    llm_base_url=None,               # optional, e.g. your Ollama server
+)
+```
 
-extractor = Extract(Config(api_key="your-api-key"))
+:::caution
+Do not pass `llm_*` options on Maxun Cloud. Cloud manages the model for you and rejects them.
+:::
 
+## Extract with selectors
+
+`maxun.extract(name, url)` starts a robot on that page. Chain the steps you want, then finish with `.build()`:
+
+```python
 robot = await (
-    extractor
-    .create("Product Extractor")
-    .navigate("https://example.com/products")
-    .capture_text({
-        "productName": ".product-title",
-        "price": ".price",
-    })
+    maxun.extract("Bookstore", "https://books.toscrape.com")
+    .capture_text({"Heading": "h1"})
+    .capture_list("article.product_pod", max_items=20)
+    .build()
 )
 
 result = await robot.run()
+
+print(result.text_data)   # {'Heading': 'All products'}
+print(result.list_data)   # [{...}, {...}, ...]
 ```
 
-### Key Features
+Selector robots don't use an LLM, so they work the same on Maxun Cloud and self-hosted Maxun.
 
-### 1. Auto List Capture
+### Capture text
 
-When using `captureList`, you only need to provide the list item selector. Maxun automatically:
-- Detects all meaningful fields within each list item
-- Extracts clean, structured data from those fields
+`capture_text` reads single values. Give each field a name and a selector:
 
 ```python
-robot = await (
-    extractor
-    .create("Products")
-    .navigate("https://example.com")
-    .capture_list({
-        "selector": ".product-card"
-    })
-)
-```
-
-###  2. Auto Pagination (Optional)
-
-Pagination is completely optional. When you **don't specify** the `pagination` field, Maxun automatically detects and handles pagination for you.
-
-```python
-.capture_list({
-    "selector": ".product-card",
-    "maxItems": 100,
+.capture_text({
+    "Title": "h1.article-title",
+    "Author": ".author-name",
+    "Published": "time",
 })
 ```
 
-### 3. Pagination with Selectors
+The values are in `result.text_data`. CSS and XPath selectors both work.
 
-For precise control, specify the pagination type and selector
+### Capture a list
 
-```python
-.capture_list({
-    "selector": ".product-card",
-    "pagination": {
-        "type": "clickNext",
-        "selector": "button.next-page",
-    },
-    "maxItems": 100,
-})
-```
-
-**Pagination Types**
-
-| Type | Description | Selector Required? | Example |
-|------|-------------|-------------------|---------|
-| `scrollDown` | Infinite scroll (downward) | ❌ No | `{ type: 'scrollDown' }` |
-| `scrollUp` | Infinite scroll (upward) | ❌ No | `{ type: 'scrollUp' }` |
-| `clickNext` | Click "Next" button/link | ✅ Yes | `{ type: 'clickNext', selector: 'a.next' }` |
-| `clickLoadMore` | Click "Load More" button | ✅ Yes | `{ type: 'clickLoadMore', selector: 'button.load-more' }` |
-
-## Methods
-
-### Navigation
-
-**navigate(url)**
+`capture_list` reads every element that matches a selector. The fields inside each item are detected automatically:
 
 ```python
-.navigate("https://example.com")
+.capture_list("article.product_pod", max_items=50)
 ```
 
-### Data Extraction
+The items are in `result.list_data`. `max_items` defaults to 100.
 
-**captureText(fields, name?)**
+### Pagination
 
-Extract specific text fields using CSS selectors:
+Maxun detects pagination automatically. To control it yourself, pass `pagination`:
 
 ```python
-.capture_text(
-    {
-        "title": ".article-title",
-        "author": ".author-name",
-    },
-    name="Article Info",
-)
+# Click a "Next" button
+.capture_list("article.product_pod", max_items=100,
+              pagination={"type": "clickNext", "selector": "li.next a"})
+
+# Click a "Load more" button
+.capture_list(".card", pagination={"type": "clickLoadMore", "selector": "button.load-more"})
+
+# Infinite scroll
+.capture_list(".feed-item", pagination={"type": "scrollDown"})
+
+# First page only
+.capture_list(".result", pagination={"type": "none"})
 ```
 
-**captureList(config, name?)**
+| `type` | Use it for | Needs `selector` |
+|---|---|---|
+| `clickNext` | A "Next" button or link | Yes |
+| `clickLoadMore` | A "Load more" button | Yes |
+| `scrollDown` | Infinite scroll | No |
+| `scrollUp` | Content that loads when scrolling up | No |
+| `none` | Reading only the first page | No |
 
-Extract data from lists with automatic field detection. See [Key Features](#key-features) above for details on auto list capture and pagination.
+### Browser actions
 
-```python
-# Simple auto-detection
-.capture_list(
-    {"selector": ".product-item"},
-    name="Products",
-)
+Add steps in the order they should happen:
 
-# With pagination
-.capture_list(
-    {
-        "selector": ".product-item",
-        "pagination": {"type": "scrollDown"},
-        "maxItems": 50,
-    },
-    name="Products",
-)
-```
+| Step | What it does |
+|---|---|
+| `.navigate(url)` | Go to another page |
+| `.click(selector)` | Click an element |
+| `.type(selector, text)` | Type into an input. The text is stored encrypted. |
+| `.wait_for(selector, timeout=30000)` | Wait for an element to appear (milliseconds) |
+| `.wait(1000)` | Pause (milliseconds) |
+| `.scroll(pages=2)` | Scroll down by a number of screen heights |
+| `.capture_screenshot("name", full_page=True)` | Take a screenshot, returned in `result.screenshots` |
 
-**captureScreenshot(name?, options?)**
-
-```python
-.capture_screenshot("Homepage", {"fullPage": True})
-```
-
-### Interaction
-
-**click(selector)**
-
-```python
-.click('button.show-more')
-```
-
-**type(selector, text, inputType?)**
-
-```python
-.type("input[name='search']", "web scraping", "text")
-```
-
-Input types: `text`, `email`, `password`, `number`, `tel`, `url`
-
-**scroll(direction, distance?)**
-
-```python
-.scroll('down', 500)
-.scroll('up')
-```
-
-### Waiting
-
-**waitFor(selector, timeout?)**
-
-```python
-.wait_for(".dynamic-content", 5000))
-```
-
-**wait(milliseconds)**
-
-```python
-.wait(2000)
-```
-
-### Configuration
-
-**setCookies(cookies)**
-
-```python
-.set_cookies([
-    {
-        "name": "session",
-        "value": "abc123",
-        "domain": ".example.com",
-    }
-])
-```
+Give any capture a label with `name="..."`, for example `.capture_list(".product", name="Products")`.
 
 ## Examples
 
-### List with Pagination
+### A list across several pages
 
 ```python
 robot = await (
-    extractor
-    .create("News Articles")
-    .navigate("https://news.example.com")
-    .capture_list({
-        "selector": "article.news-item",
-        "pagination": {
-            "type": "clickNext",
-            "selector": "a.next-page",
-        },
-        "maxItems": 100,
-    })
+    maxun.extract("Quotes", "https://quotes.toscrape.com")
+    .capture_list(
+        "div.quote",
+        max_items=50,
+        pagination={"type": "clickNext", "selector": "li.next a"},
+    )
+    .build()
 )
 
 result = await robot.run()
+print(f"{len(result.list_data)} quotes")
 ```
 
-### Multi-Step Workflow
+### Several pages in one robot
 
 ```python
 robot = await (
-    extractor
-    .create("Search Results")
-    .navigate("https://example.com")
-    .type("input[name='q']", "data extraction")
-    .click("button[type='submit']")
-    .wait_for(".results")
-    .capture_list({"selector": ".result-item"})
+    maxun.extract("Store overview", "https://shop.example.com")
+    .capture_text({"Store name": "h1"})
+    .navigate("https://shop.example.com/products")
+    .capture_list(".product", name="Products")
+    .navigate("https://shop.example.com/reviews")
+    .capture_list(".review", name="Reviews")
+    .build()
 )
 ```
 
-### Form Fill
+### Log in, then extract
 
 ```python
 robot = await (
-    extractor
-    .create("Login and Extract")
-    .navigate("https://example.com/login")
-    .type("input[name='email']", "user@example.com", "email")
-    .type("input[name='password']", "password123", "password")
-    .click("button[type='submit']")
+    maxun.extract("Dashboard data", "https://app.example.com/login")
+    .type("#email", "you@example.com")
+    .type("#password", "your-password")
+    .click("button[type=submit]")
     .wait_for(".dashboard")
-    .capture_text({
-        "username": ".user-name",
-        "balance": ".account-balance",
-    })
-)
-
-result = await robot.run()
-```
-
-## Managing Robots
-
-### Get All Robots
-
-```python
-robots = await extractor.get_robots()
-```
-
-### Get Specific Robot
-
-```python
-robot = await extractor.get_robot("robot-id")
-```
-
-### Delete Robot
-
-```python
-await extractor.delete_robot("robot-id")
-```
-
-## Running Robots
-
-```python
-# Run immediately
-result = await robot.run()
-
-# Run with options
-result = await robot.run(
-    wait_for_completion=True,
-    timeout=60000,
+    .capture_text({"Balance": ".balance", "Plan": ".plan-name"})
+    .capture_screenshot("Dashboard")
+    .build()
 )
 ```
 
-See <a href="/sdk/python-sdk/sdk-robot">Robot Management</a> for scheduling and webhooks.
+### Watch for changes
+
+Turn on [monitoring](./sdk-monitoring) to compare every run with the previous one:
+
+```python
+robot = await maxun.extract(
+    "Product prices",
+    "https://shop.example.com/product/42",
+    prompt="Product name, price and availability",
+    monitor=True,
+)
+```
+
+For selector robots, pass `monitor=True` before building:
+
+```python
+robot = await (
+    maxun.extract("Product prices", "https://shop.example.com", monitor=True)
+    .capture_list(".product")
+    .build()
+)
+```
+
+## Managing extract robots
+
+```python
+robots = await maxun.extract.list()          # all extract robots
+robot = await maxun.robots.find("Bookstore") # one robot, by name
+await robot.delete()
+```
+
+:::note
+Building a selector robot with a name and URL that already exist returns the existing robot unchanged, even if your steps are different. The SDK warns you when this happens. Use a new name, or delete the old robot first.
+:::
+
+See [Robot Management](./sdk-robot) to run, schedule and manage robots.

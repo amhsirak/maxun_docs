@@ -6,280 +6,142 @@ sidebar_position: 4
 
 # Crawl
 
-Automatically discover and scrape multiple pages from websites using sitemaps and link following.
-
-## Creating Crawl Robots
+A crawl robot starts on one page, follows the links it finds and collects the content of every page it visits. Use it to grab a whole documentation site, a blog or a product catalogue.
 
 ```python
-from maxun import Crawl, CrawlConfig, Config
+robot = await maxun.crawl("Example docs", "https://docs.example.com", limit=20)
 
-crawler = Crawl(
-    Config(api_key="your-api-key")
-)
+result = await robot.run()
 
-robot = await crawler.create(
-    "Blog Crawler",
-    "https://example.com/blog",
-    CrawlConfig(
-        mode="domain",
-        limit=50,
-        use_sitemap=True,
-        follow_links=True,
-    ),
-)
+for page in result.crawl_data:
+    print(page["metadata"]["url"])
+    print(page.get("markdown", "")[:200])
 ```
 
-## Configuration
+## Options
 
-### Basic Options
+Every option has a sensible default, so a name and a URL are enough to start.
 
-**mode** (required)
-
-Defines the crawl scope:
-- `domain` - Only pages on the exact same domain
-- `subdomain` - Domain and all its subdomains
-- `path` - Only pages under the same path
-
-**limit** (optional)
-
-Maximum number of pages to crawl. Defaults to 10.
+| Option | Default | Description |
+|---|---|---|
+| `mode` | `"domain"` | Which links to follow: `"domain"`, `"subdomain"` or `"path"` (see below) |
+| `limit` | `50` | Maximum number of pages to crawl |
+| `max_depth` | `3` | How many links away from the start page to go |
+| `include_paths` | none | Only crawl URLs matching these patterns, e.g. `["/blog/*"]` |
+| `exclude_paths` | none | Skip URLs matching these patterns, e.g. `["/admin/*"]` |
+| `use_sitemap` | `True` | Also find pages through the site's `sitemap.xml` |
+| `follow_links` | `True` | Follow links found on each page |
+| `respect_robots` | `True` | Obey the site's `robots.txt` |
+| `formats` | `["markdown"]` | What to capture from each page: `markdown`, `html`, `text`, `links`, `summary`, `screenshot-visible`, `screenshot-fullpage` |
+| `monitor` | `False` | Compare every run with the previous one. See [Monitoring](./sdk-monitoring) |
 
 ```python
-CrawlConfig(
-    mode="domain",
+robot = await maxun.crawl(
+    "Docs guides",
+    "https://docs.example.com",
     limit=100,
+    max_depth=4,
+    include_paths=["/guides/*"],
+    exclude_paths=["/guides/archive/*"],
+    formats=["markdown", "links"],
 )
 ```
 
-### Advanced Options
+## Crawl modes
 
-**maxDepth** (optional)
+`mode` decides how far the crawl may wander from the start URL.
 
-Maximum crawl depth from starting URL. Each link level counts as one depth.
+| Mode | Starting at `https://example.com/blog` it crawls |
+|---|---|
+| `domain` | Any page on `example.com` |
+| `subdomain` | Pages on `example.com` and its subdomains, such as `docs.example.com` |
+| `path` | Only pages under `example.com/blog` |
 
 ```python
-CrawlConfig(
-    mode="domain",
-    max_depth=3,
-)
+robot = await maxun.crawl("Blog", "https://example.com/blog", mode="path")
 ```
 
-**useSitemap** (optional)
+## Reading the results
 
-Fetch and parse the website's sitemap.xml. Defaults to `true`.
+`result.crawl_data` is a list with one entry per page:
 
 ```python
-CrawlConfig(
-    mode="domain",
-    use_sitemap=True,
-)
+result = await robot.run()
+
+for page in result.crawl_data:
+    print(page["metadata"]["url"])
+    print(page["metadata"].get("title"))
+    print(page.get("markdown"))
 ```
 
-**followLinks** (optional)
+Each page contains the formats you asked for (`markdown`, `html`, `text`, `links`, ...) plus `metadata` with the page's `url`, `title` and other meta tags. A page that could not be loaded has an `error` instead.
 
-Extract and follow links from each visited page. Defaults to `true`.
-
-```python
-CrawlConfig(
-    mode="domain",
-    follow_links=True,
-)
-```
-
-**includePaths** (optional)
-
-Regex patterns for URLs to include. Only matching URLs will be crawled.
-
-```python
-CrawlConfig(
-    mode="domain",
-    include_paths=[r"/blog/[0-9]{4}/.*"],
-)
-```
-
-**excludePaths** (optional)
-
-Regex patterns for URLs to exclude from crawling.
-
-```python
-CrawlConfig(
-    mode="domain",
-    exclude_paths=[r".*/admin/.*", r".*/tag/.*"],
-)
-```
-
-**respectRobots** (optional)
-
-Respect robots.txt directives. Defaults to `true`.
-
-```python
-CrawlConfig(
-    mode="domain",
-    respect_robots=True,
-)
-```
-
-## Crawl Modes
-
-### Domain Mode
-
-```python
-robot = await crawler.create(
-    "Domain Crawler",
-    "https://blog.example.com",
-    CrawlConfig(
-        mode="domain",
-        limit=50,
-    ),
-)
-```
-
-Crawls only `blog.example.com`. Won't crawl `shop.example.com` or `example.com`.
-
-### Subdomain Mode
-
-```python
-const robot = await crawler.create(
-  'Subdomain Crawler',
-  'https://example.com',
-  {
-    mode: 'subdomain',
-    limit: 100
-  }
-)
-```
-
-Crawls `example.com`, `blog.example.com`, `shop.example.com`, etc.
-
-### Path Mode
-
-```python
-robot = await crawler.create(
-    "Path Crawler",
-    "https://example.com/blog",
-    CrawlConfig(
-        mode="path",
-        limit=50,
-    ),
-)
-```
-
-Crawls only pages under `/blog/` path.
+:::tip
+Large crawls can take a while. `run()` waits until the crawl finishes. Pass `timeout=600` (seconds) to stop waiting sooner; the crawl keeps going on Maxun and you can read it later with `await robot.get_latest_run()`.
+:::
 
 ## Examples
 
-### Blog Crawl
+### A whole documentation site
 
 ```python
-robot = await crawler.create(
-    "Blog Posts",
-    "https://example.com/blog",
-    CrawlConfig(
-        mode="path",
-        limit=50,
-        use_sitemap=True,
-        follow_links=True,
-    ),
-)
-
-result = await robot.run()
-print("Pages crawled:", len(result["data"]["crawlData"]))
-```
-
-### Documentation Crawl
-
-```python
-robot = await crawler.create(
-    "Documentation",
+robot = await maxun.crawl(
+    "Product docs",
     "https://docs.example.com",
-    CrawlConfig(
-        mode="subdomain",
-        limit=200,
-        use_sitemap=True,
-        follow_links=False,
-        max_depth=5,
-    ),
+    limit=200,
+    max_depth=5,
 )
-```
 
-### Filtered Crawl
-
-```python
-robot = await crawler.create(
-    "Product Pages",
-    "https://example.com",
-    CrawlConfig(
-        mode="domain",
-        limit=100,
-        include_paths=[r"/products/.*"],
-        exclude_paths=[r".*/reviews/.*", r".*/comments/.*"],
-        use_sitemap=True,
-        follow_links=True,
-    ),
-)
-```
-
-### Full Site Crawl
-
-```python
-robot = await crawler.create(
-    "Full Site",
-    "https://example.com",
-    CrawlConfig(
-        mode="subdomain",
-        limit=500,
-        exclude_paths=[r".*/admin/.*", r".*/login.*"],
-        use_sitemap=True,
-        follow_links=True,
-        respect_robots=True,
-    ),
-)
-```
-
-## Accessing Crawl Results
-
-```python
 result = await robot.run()
-
-if result["data"].get("crawlData"):
-    pages = result["data"]["crawlData"]
-
-    for page in pages:
-        print("URL:", page.get("metadata", {}).get("url"))
-        print("Title:", page.get("metadata", {}).get("title"))
-        print("Word count:", page.get("wordCount"))
-        print("Status:", page.get("metadata", {}).get("statusCode"))
+docs = {
+    page["metadata"]["url"]: page["markdown"]
+    for page in result.crawl_data
+    if "markdown" in page
+}
 ```
 
-Each page contains:
-- **metadata** - URL, title, description, language, meta tags, favicon, status code
-- **html** - Full page HTML
-- **text** - Clean body text
-- **wordCount** - Number of words
-- **links** - All links found on the page
-- **summary** - AI-generated plain-text summary of the page
-
-## Managing Crawl Robots
+### Only blog posts
 
 ```python
-# Get all crawl robots
-robots = await crawler.get_robots()
-
-# Get specific robot
-robot = await crawler.get_robot("robot-id")
-
-# Delete robot
-await crawler.delete_robot("robot-id")
+robot = await maxun.crawl(
+    "Blog posts",
+    "https://example.com",
+    include_paths=["/blog/*"],
+    exclude_paths=["/blog/tag/*", "/blog/page/*"],
+    limit=50,
+)
 ```
 
-## Running Crawl Robots
+### Keep a knowledge base up to date
+
+Crawl once a week and see which pages were added, removed or changed:
 
 ```python
-# Run immediately
+robot = await maxun.crawl("Help center", "https://help.example.com", limit=100, monitor=True)
+await robot.schedule(run_every=1, run_every_unit="WEEKS", start_from="MONDAY", at_time_start="06:00")
+```
+
+See [Monitoring](./sdk-monitoring) for how to read the changes.
+
+### Summarize every page
+
+```python
+robot = await maxun.crawl("Docs summaries", "https://docs.example.com", formats=["summary"], limit=20)
+
 result = await robot.run()
-
-# Run with timeout (milliseconds)
-result = await robot.run(timeout=60000)
+for page in result.crawl_data:
+    print(page["metadata"]["url"], "→", page.get("summary"))
 ```
 
-For scheduling, webhooks, and other robot management features, see <a href="/sdk/python-sdk/sdk-robot">Robot Management</a>.
+`summary` uses an LLM. On self-hosted Maxun, also pass `llm_provider`, `llm_api_key` and optionally `llm_model` and `llm_base_url`. On Maxun Cloud, leave them out.
+
+## Managing crawl robots
+
+```python
+robots = await maxun.crawl.list()            # all crawl robots
+robot = await maxun.robots.find("Blog posts")
+await robot.set_list_limit(500)              # crawl more pages from now on
+await robot.delete()
+```
+
+See [Robot Management](./sdk-robot) to run, schedule and manage robots.

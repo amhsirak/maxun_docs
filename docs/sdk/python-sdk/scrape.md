@@ -1,261 +1,170 @@
 ---
 id: sdk-scrape
 title: Scrape
-sidebar_position: 3
+sidebar_position: 2
 ---
 
 # Scrape
 
-Convert webpages into clean HTML, LLM-ready Markdown, or screenshots with zero configuration.
-
-## Creating Scrape Robots
+A scrape robot turns a web page into clean Markdown, HTML, plain text, a list of links, an AI summary or screenshots.
 
 ```python
-from maxun import Scrape, Config
+from maxun import Maxun
 
-scraper = Scrape(
-    Config(api_key="your-api-key")
-)
-
-robot = await scraper.create(
-    "Content Scraper",
-    "https://example.com/article",
-    formats=["markdown", "html"],
-)
+async with Maxun() as maxun:
+    robot = await maxun.scrape("Example page", "https://example.com")
+    result = await robot.run()
+    print(result.markdown)
 ```
 
-## Output Formats
+`maxun.scrape(name, url)` saves the robot on your account. Run it again any time with `await robot.run()`.
 
-### Markdown
+## Output formats
+
+Choose what you want back with `formats`. The default is `["markdown"]`.
+
+| Format | Read it from | What you get |
+|---|---|---|
+| `markdown` | `result.markdown` | The page as clean Markdown, ready for an LLM |
+| `html` | `result.html` | The page's HTML |
+| `text` | `result.text` | The page's visible text |
+| `links` | `result.links` | Every link on the page |
+| `summary` | `result.summary` | An AI-written summary of the page |
+| `screenshot-visible` | `result.screenshots` | A screenshot of the visible part of the page |
+| `screenshot-fullpage` | `result.screenshots` | A screenshot of the whole page |
+
+Ask for as many formats as you need in one robot:
 
 ```python
-from maxun import Scrape, Config
-
-scraper = Scrape(Config(api_key="your-api-key"))
-
-robot = await scraper.create(
-    "Article Scraper",
-    "https://blog.example.com/post",
-    formats=["markdown"],
+robot = await maxun.scrape(
+    "Pricing page",
+    "https://example.com/pricing",
+    formats=["markdown", "links", "screenshot-fullpage"],
 )
 
 result = await robot.run()
-print(result["data"]["markdown"])
-```
 
-### HTML
-
-```python
-from maxun import Scrape, Config
-
-scraper = Scrape(Config(api_key="your-api-key"))
-
-robot = await scraper.create(
-    "HTML Scraper",
-    "https://example.com",
-    formats=["html"],
-)
-
-result = await robot.run()
-print(result["data"]["html"])
-```
-
-### Screenshots
-
-```python
-from maxun import Scrape, Config
-
-scraper = Scrape(Config(api_key="your-api-key"))
-
-# Visible viewport
-robot_visible = await scraper.create(
-    "Screenshot Bot",
-    "https://example.com",
-    formats=["screenshot-visible"],
-)
-
-# Full page
-robot_full = await scraper.create(
-    "Full Page Screenshot",
-    "https://example.com",
-    formats=["screenshot-fullpage"],
-)
+print(result.markdown)
+print(result.links)
+print(result.screenshots)
 ```
 
 ### Summary
 
-Generates an AI-powered plain-text summary of the page. Can be combined with other formats.
+`summary` adds a short AI-written summary next to the other formats:
 
 ```python
-from maxun import Scrape, Config
-
-scraper = Scrape(Config(api_key="your-api-key"))
-
-robot = await scraper.create(
-    "Blog Post Summarizer",
+robot = await maxun.scrape(
+    "Blog post",
     "https://blog.example.com/post",
-    formats=["summary"],
+    formats=["markdown", "summary"],
 )
 
 result = await robot.run()
-print(result["data"]["summary"])
+print(result.summary)
 ```
-
-Combine with `markdown` to get both the full content and a summary:
-
-```python
-from maxun import Scrape, Config
-
-scraper = Scrape(Config(api_key="your-api-key"))
-
-robot = await scraper.create(
-    "Blog Post Summarizer",
-    "https://blog.example.com/post",
-    formats=["summary", "markdown"],
-)
-
-result = await robot.run()
-print(result["data"]["summary"])   # AI-generated plain-text summary
-print(result["data"]["markdown"])  # Full page markdown
-```
-
-### Multiple Formats
-
-```python
-from maxun import Scrape, Config
-
-scraper = Scrape(Config(api_key="your-api-key"))
-
-robot = await scraper.create(
-    "Multi-Format Scraper",
-    "https://example.com",
-    formats=["markdown", "html", "screenshot-visible"],
-)
-
-result = await robot.run()
-
-print(result["data"]["markdown"])
-print(result["data"]["html"])
-print(result["data"]["screenshots"])
-```
-
----
 
 ## Smart Queries
 
-Smart Queries let you attach a natural language prompt to a scrape robot. After the page is scraped, an LLM analyzes the page content and returns an answer to your prompt.
-
-The result is returned as `result["data"]["promptResult"]`.
-
+A Smart Query is a question about the page. Maxun scrapes the page, then an LLM answers your question on every run.
 
 ```python
-from maxun import Scrape, Config
-
-scraper = Scrape(Config(api_key="your-api-key"))
-
-robot = await scraper.create(
-    "Pricing Scraper",
+robot = await maxun.scrape(
+    "Pricing plans",
     "https://example.com/pricing",
-    formats=["markdown"],
-    smart_queries="List all plan names and their monthly prices.",
+    smart_queries="List every plan with its monthly price.",
 )
 
 result = await robot.run()
-print(result["data"]["markdown"])       # full page markdown
-print(result["data"]["promptResult"])   # "Starter: $9/mo, Growth: $29/mo, Pro: $99/mo"
+print(result.smart_query_result)
 ```
 
-### More Examples
+You can also ask a different question for a single run, without changing the robot:
 
 ```python
-# Extract specific data points
-robot = await scraper.create(
-    "Company Info",
-    "https://example.com/about",
-    formats=["markdown"],
-    smart_queries="What is the company founding year and headquarters location?",
-)
-
-# Summarize content
-robot = await scraper.create(
-    "Blog Post Summarizer",
-    "https://blog.example.com/post",
-    formats=["markdown"],
-    smart_queries="Summarize this article in 3 bullet points.",
-)
-
-result = await robot.run()
-print(result["data"]["promptResult"])
+result = await robot.run(smart_queries="Which plan includes SSO?")
+print(result.smart_query_result)
 ```
 
----
+:::note
+`summary` and Smart Queries use an LLM. On Maxun Cloud this is handled for you. On self-hosted Maxun, add the [LLM settings](#llm-settings-self-hosted) below.
+:::
+
+## Options
+
+| Option | Default | Description |
+|---|---|---|
+| `formats` | `["markdown"]` | Output formats (see above) |
+| `smart_queries` | none | A question an LLM answers about the page on every run |
+| `monitor` | `False` | Compare every run with the previous one. See [Monitoring](./sdk-monitoring) |
+| `llm_provider`, `llm_model`, `llm_api_key`, `llm_base_url` | none | Self-hosted Maxun only, see below |
+
+## Running a scrape robot
+
+```python
+result = await robot.run()
+```
+
+`run()` waits until the page is scraped and returns the result. You can change the formats for a single run:
+
+```python
+result = await robot.run(formats=["html"])
+print(result.html)
+```
+
+If the run fails, `run()` raises `RunFailedError`. See [Robot Management](./sdk-robot) for run history, schedules and webhooks.
+
+## LLM settings (self-hosted)
+
+Self-hosted Maxun has no built-in LLM, so `summary` and Smart Queries need one:
+
+```python
+robot = await maxun.scrape(
+    "Pricing plans",
+    "https://example.com/pricing",
+    smart_queries="List every plan with its monthly price.",
+    llm_provider="anthropic",        # "anthropic", "openai" or "ollama"
+    llm_api_key="your-llm-api-key",  # required for anthropic and openai
+    llm_model="claude-sonnet-4-5",   # optional
+)
+```
+
+:::caution
+Do not pass `llm_*` options on Maxun Cloud. Cloud manages the model for you and rejects them.
+:::
 
 ## Examples
 
-### RAG Pipeline
+### Feed a RAG pipeline
 
 ```python
-from maxun import Scrape, Config
-
-scraper = Scrape(Config(api_key="your-api-key"))
-
-robot = await scraper.create(
-    "RAG Content",
-    "https://docs.example.com/guide",
-    formats=["markdown"],
-)
-
+robot = await maxun.scrape("Docs guide", "https://docs.example.com/guide")
 result = await robot.run()
-markdown = result["data"]["markdown"]
 
-# Send to embedding service
-create_embeddings(markdown)
+create_embeddings(result.markdown)
 ```
 
-### Content Aggregation
+### Scrape several pages
+
+Give each robot its own name:
 
 ```python
-from maxun import Scrape, Config
+pages = {
+    "Post: Launch week": "https://blog.example.com/launch-week",
+    "Post: Pricing update": "https://blog.example.com/pricing-update",
+}
 
-scraper = Scrape(Config(api_key="your-api-key"))
-
-urls = [
-    "https://blog.example.com/post-1",
-    "https://blog.example.com/post-2",
-]
-
-for url in urls:
-    robot = await scraper.create(
-        f"Article {url}",
-        url,
-        formats=["markdown"],
-    )
-
+for name, url in pages.items():
+    robot = await maxun.scrape(name, url)
     result = await robot.run()
-    save_to_database(result["data"]["markdown"])
+    save_to_database(url, result.markdown)
 ```
 
-## Managing Scrape Robots
+### Use an existing robot
 
 ```python
-# Get all scrape robots
-robots = await scraper.get_robots()
-
-# Get specific robot
-robot = await scraper.get_robot("robot-id")
-
-# Delete robot
-await scraper.delete_robot("robot-id")
-```
-
-## Running Scrape Robots
-
-```python
-# Run immediately
+robot = await maxun.robots.find("Pricing plans")   # by name
 result = await robot.run()
-
-# Run with timeout (milliseconds)
-result = await robot.run(timeout=30000)
 ```
 
-For scheduling, webhooks, and other robot management features, see <a href="/sdk/python-sdk/sdk-robot">Robot Management</a>.
+List your scrape robots with `await maxun.scrape.list()`. See [Robot Management](./sdk-robot) for everything else you can do with a robot.
