@@ -1,4 +1,7 @@
 ---
+title: "Maxun Quickstart: Cloud, SDK & Open-Source Setup"
+description: "Get started with Maxun in minutes. Sign up for Maxun Cloud, install the Node.js or Python SDK, or self-host the open-source edition with Docker."
+sidebar_label: "Get Started"
 sidebar_position: 2
 slug: /quickstart
 ---
@@ -7,7 +10,9 @@ import TabItem from '@theme/TabItem';
 
 # Get Started
 
-### Maxun Cloud
+Get started with Maxun in minutes. Sign up for Maxun Cloud, install the Node.js or Python SDK, or self-host the open-source edition with Docker.
+
+## Maxun Cloud
 
 - Sign up at <a href="https://app.maxun.dev/register">https://app.maxun.dev/register</a>.
 - Set up your data extraction robot. <a href="/robot/robots">Choose your robot type</a>.
@@ -15,7 +20,7 @@ import TabItem from '@theme/TabItem';
 
 That’s it! Most users create their first robot in less than a minute.
 
-### Maxun SDKs
+## Maxun SDKs
 
 Maxun provides official **Node.js and Python SDKs** for creating and running robots programmatically. 
 
@@ -60,32 +65,26 @@ Create and run a robot programmatically using the Maxun SDK.
   <TabItem value="node" label="Node.js">
 
 ```javascript
-// Scrape content from a website in markdown and HTML
-import { Scrape } from 'maxun-sdk';
+import { Maxun } from 'maxun-sdk';
 
-const scraper = new Scrape({apiKey: process.env.MAXUN_API_KEY});
+const maxun = new Maxun();
 
-const robot = await scraper.create(
-  'Content Scraper',
-  'https://example.com/article',
-  { formats: ['markdown', 'html'] }
-);
+const robot = await maxun.scrape('Example page', 'https://example.com');
+const result = await robot.run();
+
+console.log(result.markdown);
 ```
 
   </TabItem>
   <TabItem value="python" label="Python">
 
 ```python
-# Scrape content from a website in markdown and HTML
-from maxun import Scrape, Config
+from maxun import Maxun
 
-scraper = Scrape(Config(api_key="your-api-key"))
-
-robot = await scraper.create(
-    "Content Scraper",
-    "https://example.com/article",
-    formats=["markdown", "html"],
-)
+async with Maxun() as maxun:
+    robot = await maxun.scrape("Example page", "https://example.com")
+    result = await robot.run()
+    print(result.markdown)
 ```
 
   </TabItem>
@@ -93,5 +92,5 @@ robot = await scraper.create(
 
 For more detailed usage, see the [Node.js SDK](/sdk/node-sdk/sdk-overview) and [Python SDK](/sdk/python-sdk/sdk-overview) guides.
 
-### Maxun Community Edition
-Maxun is open-source and can run on your system. Learn how to <a href="/category/self-host">setup Maxun locally</a>.
+## Maxun Community Edition
+Maxun is open-source and can run on your own infrastructure. Learn how to <a href="/category/self-host">self-host Maxun</a> with Docker Compose or a local setup.
