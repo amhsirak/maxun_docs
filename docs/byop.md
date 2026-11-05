@@ -54,6 +54,17 @@ Looking for a proxy provider? The following partners offer reliable proxies that
 </tr>
 
 <tr>
+<td width="30%" height="100" align="center" valign="middle">
+<a href="https://www.swiftproxy.net/?ref=maxun">
+  <img src="https://github.com/user-attachments/assets/a1d2309b-d3bd-45e6-8760-ce1f8dcd18b9" alt="Swiftproxy" width="240" />
+</a>
+</td>
+<td width="80%" valign="middle">
+<a href="https://www.swiftproxy.net/?ref=maxun"><strong>Swiftproxy</strong></a> provides 90M+ residential IPs across 220+ locations worldwide, helping Maxun users scrape websites, access geo-restricted content, and collect web data across different regions. Supports rotating and static residential proxies, HTTP(S), and SOCKS5. <strong>Free testing available. </strong><strong>Discount:</strong> <code>PROXY90</code> - 10% off.
+</td>
+</tr>
+
+<tr>
 <td width="20%" align="center" valign="middle">
 <a href="https://proxy-seller.com/?partner=224ED2B5F5D24719">
   <img src="https://github.com/user-attachments/assets/ac862778-464d-49ae-af7e-69712d9b74a4" alt="Proxy-Seller" width="300" />
@@ -73,18 +84,6 @@ Looking for a proxy provider? The following partners offer reliable proxies that
 </td>
 <td width="80%" valign="middle">
 <a href="https://byteful.com/?utm_source=github&utm_medium=github-sponsor&utm_campaign=maxun_github_sponsorship"><strong>Byteful</strong></a> is a UK-based web data infrastructure platform providing ethically sourced residential, mobile, static residential (ISP) and datacenter proxies alongside API-first tools for web scraping, data collection, and AI-driven automation, processing tens of billions of requests per month. Discount: <code>MAXUN10</code> - Get 10% off Byteful Residential Proxies.
-</td>
-</tr>
-
-<tr>
-<td width="20%" align="center" valign="middle">
-<a href="https://www.thordata.com/?ls=maxunbyo&lk=maxunbyo">
-  <img src="https://github.com/user-attachments/assets/74ba8f9e-a8a8-4c6a-b06c-cd048a118117" alt="Thordata" width="260" />
-</a>
-</td>
-<td width="80%" valign="middle">
-<a href="https://www.thordata.com/?ls=maxunbyo&lk=maxunbyo"><strong>Thordata – Reliable Proxies for Web Scraping & AI Data Collection </strong></a>
- offers Residential, Mobile, ISP & Datacenter Proxies · 190+ countries with city-level targeting · Sticky and rotating sessions for flexible workflows · Fast, stable proxy infrastructure for developers. <strong>Discount:</strong> <code>MAXUN10</code> - Get 10% off.
 </td>
 </tr>
 
